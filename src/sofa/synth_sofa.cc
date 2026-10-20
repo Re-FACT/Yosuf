@@ -77,7 +77,7 @@ struct SynthSofaPass : public ScriptPass {
     top_opt = "-auto-top";
     blif_file = "";
     verilog_file = "";
-    family = SOFA_DNAME;
+    family = SOFA_HD_DNAME;
     inferAdder = true;
     inferDsp = true;
     no_opt = false;
@@ -241,6 +241,51 @@ struct SynthSofaPass : public ScriptPass {
       }
     }
 
+    if (check_label("map_dsp"), "(skip if -no_dsp)") {
+      struct DspParams {
+        size_t a_maxwidth;
+        size_t b_maxwidth;
+        size_t a_minwidth;
+        size_t b_minwidth;
+        std::string type;
+      };
+
+      const std::vector<DspParams> dsp_rules = {
+          {16, 16, 9, 9, "mult_16x16_map"},
+          {8, 8, 2, 2, "mult_8x8_map"},
+      };
+
+      if (help_mode || family == SOFA_PLUS_HD_DNAME) {
+        if (help_mode || !nodsp) {
+          run("memory_dff", "                      (for sofa-plus)");
+          if (!no_opt) {
+            run("wreduce t:$mul", "                  (for sofa-plus)");
+          }
+          run("rf_new_dsp");
+          for (const auto &rule : dsp_rules) {
+            run(stringf("techmap -map +/mul2dsp.v "
+                        "-map %s/dsp_map.v "
+                        "-D DSP_A_MAXWIDTH=%zu -D DSP_B_MAXWIDTH=%zu "
+                        "-D DSP_A_MINWIDTH=%zu -D DSP_B_MINWIDTH=%zu "
+                        "-D DSP_NAME=%s",
+                        std::string(lib_path + family).c_str(), rule.a_maxwidth,
+                        rule.b_maxwidth, rule.a_minwidth, rule.b_minwidth,
+                        rule.type.c_str()));
+            /* Without the following command, some multiplier may be skipped */
+            run("chtype -set $mul t:$__soft_mul", "  (for sofa-plus)");
+          }
+          run("select a:mul2dsp", "                (for sofa-plus)");
+          run("setattr -unset mul2dsp", "          (for sofa-plus)");
+          if (!no_opt) {
+            run("opt_expr -fine", "                  (for sofa-plus)");
+            run("wreduce", "                         (for sofa-plus)");
+          }
+          run("select -clear", "                   (for sofa-plus)");
+          run("chtype -set $mul t:$__soft_mul", "  (for sofa-plus)");
+        }
+      }
+    }
+
     if (check_label("coarse")) {
       run("techmap -map +/cmp2lut.v -D LUT_WIDTH=" + std::to_string(max_lut_size));
       if (!no_opt) {
@@ -260,7 +305,7 @@ struct SynthSofaPass : public ScriptPass {
 
     if (check_label("map_gates")) {
       if (help_mode ||
-          (inferAdder && (family == SOFA_DNAME))) {
+          (inferAdder && (family == QLSOFA_HD_DNAME || family == SOFA_PLUS_HD_DNAME))) {
         run("techmap -map +/techmap.v -map " + lib_path + family +
                 "/arith_map.v",
             "(unless -no_adder)");
