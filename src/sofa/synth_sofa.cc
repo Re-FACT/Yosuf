@@ -5,7 +5,9 @@
 
 using namespace std;
 /* Constants for device name */
-constexpr const char *SOFA_DNAME = "sofa";
+constexpr const char *SOFA_HD_DNAME = "sofa-hd";
+constexpr const char *QLSOFA_HD_DNAME = "qlsofa-hd";
+constexpr const char *SOFA_PLUS_HD_DNAME = "sofa-plus-hd";
 
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
@@ -34,7 +36,9 @@ struct SynthSofaPass : public ScriptPass {
     log("        run synthesis for the specified Sofa architecture\n");
     log("        generate the synthesis netlist for the specified family.\n");
     log("        supported values:\n");
-    log("        - sofa\n");
+    log("          " + string(SOFA_HD_DNAME) + "\n");
+    log("          " + string(QLSOFA_HD_DNAME) + "\n");
+    log("          " + string(SOFA_PLUS_HD_DNAME) + "\n");
     log("\n");
     log("    -blif <file>\n");
     log("        write the design to the specified BLIF file. Writing of an "
@@ -62,6 +66,7 @@ struct SynthSofaPass : public ScriptPass {
   bool no_opt;
   bool abc9;
   bool inferAdder;
+  bool inferDsp;
   bool show_help;
   size_t DEFAULT_K = 4;
   size_t MIN_K = 4;
@@ -74,6 +79,7 @@ struct SynthSofaPass : public ScriptPass {
     verilog_file = "";
     family = SOFA_DNAME;
     inferAdder = true;
+    inferDsp = true;
     no_opt = false;
     abc9 = false;
     lib_path = "+/yosuf/";
@@ -122,6 +128,10 @@ struct SynthSofaPass : public ScriptPass {
         inferAdder = false;
         continue;
       }
+      if (args[argidx] == "-no_dsp") {
+        inferDsp = false;
+        continue;
+      }
       if (args[argidx] == "-no_opt") {
         no_opt = false;
         continue;
@@ -143,10 +153,17 @@ struct SynthSofaPass : public ScriptPass {
       log_cmd_error("This command only operates on fully selected designs!\n");
     }
     /* Pre-check on family name and confirm on selection*/
-    if (family != SOFA_DNAME) {
+    if (family != SOFA_HD_DNAME && family != QLSOFA_HD_DNAME  && family != SOFA_PLUS_HD_DNAME) {
       log_cmd_error("Invalid family specified: '%s'\n", family.c_str());
     }
     log("Selected device family: %s\n", family.c_str());
+    if (family == SOFA_HD_DNAME) {
+      inferAdder = false;
+      inferDsp = false;
+    } else if (family == QLSOFA_HD_DNAME) {
+      inferAdder = true;
+      inferDsp = false;
+    }
     /* By default, no opt should be enabled. Throw a warning if not */
     if (no_opt) {
       log_warning("Force to disable any optimization, which may cast an "
