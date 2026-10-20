@@ -4,7 +4,7 @@
 # Yosys symbols are resolved from the yosys executable at load time.
 # ---------------------------------------------------------------------------
 add_library(sofa MODULE
-  sofa/synth_sofa.cc
+  synth_sofa.cc
 )
 
 set_target_properties(sofa PROPERTIES
