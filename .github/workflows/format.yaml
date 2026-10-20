@@ -1,0 +1,63 @@
+name: Code Format
+
+# Run CI on push, PR, and weekly.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * 0 " # weekly
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Multiple job to tests
+jobs:
+  change_detect:
+    name: "Check"
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: "C/C++"
+            code_type: "-cpp"
+          - name: "XML"
+            code_type: "-xml"
+          - name: "Python"
+            code_type: "-py"
+          - name: "Yaml"
+            code_type: "-yaml"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Checkout infra
+        uses: actions/checkout@v4
+        with:
+          repository: Re-FACT/refact_infra
+          path: utils/refact_infra
+
+      - name: Install dependencies
+        run: |
+          sudo bash ./.github/workflows/format_dependency_ubuntu.sh
+          sudo apt install python3-venv
+          python3 -m venv .venv
+          source .venv/bin/activate
+          sudo python3 -m pip install -r format_requirements.txt
+          
+      - name: Dump tool versions
+        run: |
+          clang-format --version
+          black --version
+
+      - name: Check format
+        run: | 
+          make check-format${{ matrix.config.code_type }} INFRA_ROOT=utils/refact_infra
