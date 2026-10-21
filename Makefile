@@ -111,7 +111,7 @@ list_cmake_targets: prebuild
 # Show the targets available to be built, which can be specified through ``CMAKE_GOALS`` when compile
 	cd ${BUILD_DIR} && make help && cd -
 
-all: checkout_all
+all: checkout_build
 # A shortcut command to run checkout and compile in serial
 	@+${MAKE} compile
 
