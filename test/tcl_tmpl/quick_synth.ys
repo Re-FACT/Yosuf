@@ -1,5 +1,4 @@
-# Load the yosuf plugin (shared lib)
-plugin -i yosys-sofa.so
+# Load the yosuf plugin (shared lib) in the command-line option when launching
 # Read verilog
 read_verilog ../etc/benchmarks/ubm/simple_gates/and2/and2.v
 # Run synthesis
