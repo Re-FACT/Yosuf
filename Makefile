@@ -122,7 +122,7 @@ all: checkout_build
 
 format-cpp:
 # Format all the C/C++ files under this project, excluding submodules
-	for f in `find libs/lib* core -iname *.cpp -o -iname *.hpp -o -iname *.c -o -iname *.h`; \
+	for f in `find core -iname *.cpp -o -iname *.hpp -o -iname *.c -o -iname *.h`; \
 	do \
 	${CLANG_FORMAT_EXEC} --style=file -i $${f} || exit 1; \
 	done

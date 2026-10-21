@@ -42,4 +42,4 @@ endif()
 # All the plugins are under the src directory. including the support for multiple devices
 # ---------------------------------------------------------------------------
 set(YOSUF_SHARE_DIRNAME "yosuf")
-add_subdirectory(src)
+add_subdirectory(core)
