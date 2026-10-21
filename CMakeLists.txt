@@ -30,11 +30,11 @@ else()
 endif()
 list(APPEND CMAKE_MODULE_PATH ${YOSYS_SOURCE_DIR}/cmake)
 # Now include yosys with the settings above
-add_subdirectory(thirdparty/yosys)
+add_subdirectory(yosys)
 
 if(NOT TARGET ${YOSYS_TARGET})
   message(FATAL_ERROR
-    "thirdparty/yosys did not define a target named '${YOSYS_TARGET}'. "
+    "yosys did not define a target named '${YOSYS_TARGET}'. "
     "Set -DYOSYS_TARGET=<name> to the Yosys executable target.")
 endif()
 
