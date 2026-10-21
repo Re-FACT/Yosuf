@@ -1,5 +1,5 @@
 [submodule "thirdparty/yosys"]
-	path = yosys
+	path = thirdparty/yosys
 	url = https://github.com/YosysHQ/yosys.git
 [submodule "etc/ubm"]
 	path = etc/benchmarks/ubm
