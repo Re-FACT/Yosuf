@@ -35,7 +35,6 @@ env:
 jobs:
   # Test the compilation compatibility
   win_build:
-    needs: change_detect
     name: ${{ matrix.config.name }}
     runs-on: windows-latest
     # Branch on different OS and settings
