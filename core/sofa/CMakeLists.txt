@@ -24,6 +24,15 @@ if(APPLE)
   target_link_options(yosys-sofa PRIVATE -undefined dynamic_lookup)
 endif()
 
+# The shared lib should sit aside to yosys binary. It is easy to test
+add_custom_command(
+    TARGET yosys-sofa POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:yosys-sofa>
+            "${YOSYS_CMAKE_BINARY_DIR}/"
+    COMMENT "Copying SOFA shared lib to the Yosys executable directory"
+)
+
 # Define the list of tech libraries
 set(TECH_LIBS "sofa-hd" "qlsofa-hd" "sofa-plus-hd")
 # Create the subdir before copy
