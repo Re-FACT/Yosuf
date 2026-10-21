@@ -26,7 +26,14 @@ endif()
 
 # Define the list of tech libraries
 set(TECH_LIBS "sofa-hd" "qlsofa-hd" "sofa-plus-hd")
-
+# Create the subdir before copy
+add_custom_command(
+    TARGET yosys-sofa
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+            "${YOSYS_CMAKE_BINARY_DIR}/share/${YOSUF_SHARE_DIRNAME}"
+    COMMENT "Creating ${YOSUF_SHARE_DIRNAME} under Yosys shared directory"
+)
 # Loop to create three separate custom commands attached to the target
 foreach(LIB_NAME ${TECH_LIBS})
     add_custom_command(
@@ -34,8 +41,8 @@ foreach(LIB_NAME ${TECH_LIBS})
         POST_BUILD
         # This will safely run for each folder; copy_directory auto-creates missing paths
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/${LIB_NAME}"
-            "${YOSYS_CMAKE_BINARY_DIR}/share/${LIB_NAME}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/${YOSUF_SHARE_DIRNAME}/${LIB_NAME}"
+            "${YOSYS_CMAKE_BINARY_DIR}/share/${YOSUF_SHARE_DIRNAME}/${LIB_NAME}"
         COMMENT "Copying ${LIB_NAME} to Yosys shared directory"
     )
 endforeach()
@@ -49,5 +56,5 @@ install(TARGETS yosys-sofa
 # Loop to create three separate custom commands attached to the target
 foreach(LIB_NAME ${TECH_LIBS})
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_NAME}
-          DESTINATION ${CMAKE_INSTALL_DATADIR}/yosys/${LIB_NAME})
+          DESTINATION ${CMAKE_INSTALL_DATADIR}/yosys/${YOSUF_SHARE_DIRNAME}/${LIB_NAME})
 endforeach()
