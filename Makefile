@@ -94,7 +94,7 @@ checkout_shallow:
 
 checkout_build:
 # Checkout the submodules required to build source codes
-	@+${MAKE} checkout SUBMODULE=thirdparty/yosys
+	@+${MAKE} checkout SUBMODULE=yosys
 
 prebuild:
 # Run cmake to generate Makefile under the build directory, before compilation
