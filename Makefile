@@ -128,7 +128,7 @@ all: checkout_build
 quick_test: checkout_regtest
 # Run a quick smoke test to test build results
 	echo "==== Quick test ===="
-	mkdir -p ${TMP_QUICK_TEST} && currDir=${PWD} && cd ${TMP_QUICK_TEST} && \
+	currDir=${PWD} && mkdir -p ${TMP_QUICK_TEST} && cd ${TMP_QUICK_TEST} && \
 	${currDir}/build/thirdparty/yosys/yosys ${currDir}/test/tcl_tmpl/quick_synth.ys && \
 	cd ${currDir} || exit 1;
 
