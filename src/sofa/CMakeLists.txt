@@ -41,7 +41,7 @@ foreach(LIB_NAME ${TECH_LIBS})
         POST_BUILD
         # This will safely run for each folder; copy_directory auto-creates missing paths
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/${YOSUF_SHARE_DIRNAME}/${LIB_NAME}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/${LIB_NAME}"
             "${YOSYS_CMAKE_BINARY_DIR}/share/${YOSUF_SHARE_DIRNAME}/${LIB_NAME}"
         COMMENT "Copying ${LIB_NAME} to Yosys shared directory"
     )
