@@ -10,10 +10,6 @@
 #
 #  Pick the type of compilation. Can be either ``release`` or ``debug``. By default, release mode is selected (full optimization on runtime).
 #
-# .. option:: EDITION_TYPE=<string>
-#
-#  Pick the type of edition. Can be either ``engineering`` or ``production``. By default, production mode is selected (only HDL-to-Bitstream design flow supported).
-#
 # .. option:: CMAKE_FLAGS=<string>
 #
 #  Force compilation flags for CMake to generate Makefiles
@@ -26,7 +22,7 @@ CMAKE_BUILD_TYPE := $(shell echo ${BUILD_TYPE} | sed 's/_\?pgo//' | sed 's/_\?st
 
 # Allow users to pass parameters to cmake, without defining build types
 # e.g. make CMAKE_FLAGS="-DCMAKE_CXX_COMPILER=g++-9'
-override CMAKE_FLAGS := -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DARKANGEL_EDITION_TYPE=${EDITION_TYPE} -G 'Unix Makefiles' ${CMAKE_FLAGS}
+override CMAKE_FLAGS := -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -G 'Unix Makefiles' ${CMAKE_FLAGS}
 
 # -s : Suppresss makefile output (e.g. entering/leaving directories)
 # --output-sync target : For parallel compilation ensure output for each target is synchronized (make version >= 4.0)
