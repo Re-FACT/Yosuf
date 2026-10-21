@@ -7,15 +7,15 @@ add_library(yosys-sofa MODULE
   synth_sofa.cc
 )
 
-set_target_properties(sofa PROPERTIES
+set_target_properties(yosys-sofa PROPERTIES
   PREFIX ""
   CXX_VISIBILITY_PRESET default
 )
-target_include_directories(sofa PRIVATE "${YOSYS_SOURCE_DIR}")
-add_dependencies(sofa ${YOSYS_TARGET})   # build Yosys first
+target_include_directories(yosys-sofa PRIVATE "${YOSYS_SOURCE_DIR}")
+add_dependencies(yosys-sofa ${YOSYS_TARGET})   # build Yosys first
 
 if(APPLE)
-  target_link_options(sofa PRIVATE -undefined dynamic_lookup)
+  target_link_options(yosys-sofa PRIVATE -undefined dynamic_lookup)
 endif()
 
 # Copy the tech libs to yosys share directory
@@ -36,5 +36,11 @@ add_custom_command(TARGET yosys-sofa POST_BUILD
 # Install (cmake --install build --prefix <dir>)
 # ---------------------------------------------------------------------------
 include(GNUInstallDirs)
-install(TARGETS sofa
+install(TARGETS yosys-sofa
         LIBRARY DESTINATION "${CMAKE_INSTALL_BINDIR}")
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/sofa-hd
+        DESTINATION "${CMAKE_INSTALL_DATADIR}")
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/qlsofa-hd
+        DESTINATION "${CMAKE_INSTALL_DATADIR}")
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/sofa-plus-hd
+        DESTINATION "${CMAKE_INSTALL_DATADIR}")
