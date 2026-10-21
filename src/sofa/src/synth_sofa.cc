@@ -36,9 +36,9 @@ struct SynthSofaPass : public ScriptPass {
     log("        run synthesis for the specified Sofa architecture\n");
     log("        generate the synthesis netlist for the specified family.\n");
     log("        supported values:\n");
-    log("          %s\n", STR(SOFA_HD_DNAME));
-    log("          %s\n", STR(QLSOFA_HD_DNAME));
-    log("          %s\n", STR(SOFA_PLUS_HD_DNAME));
+    log("          %s\n", SOFA_HD_DNAME);
+    log("          %s\n", QLSOFA_HD_DNAME);
+    log("          %s\n", SOFA_PLUS_HD_DNAME);
     log("\n");
     log("    -blif <file>\n");
     log("        write the design to the specified BLIF file. Writing of an "
@@ -345,7 +345,9 @@ struct SynthSofaPass : public ScriptPass {
       run("abc -lut " + std::to_string(max_lut_size));
       /* Map dff and adder again since ABC may generate new gates */
       run("techmap -map " + lib_path + family + "/dff_map.v");
-      run("techmap -map " + lib_path + family + "/arith_map.v");
+      if (inferAdder) {
+        run("techmap -map " + lib_path + family + "/arith_map.v");
+      }
     }
 
     if (check_label("check")) {
