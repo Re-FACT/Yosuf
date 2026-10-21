@@ -54,6 +54,7 @@ FORCE_COMMIT_VERSION_UPDATE = off
 INFRA_ROOT = ${PWD}/utils/refact_infra/
 
 # Reg test options
+TMP_QUICK_TEST = _tmp_quick_test
 REG_TEST_TYPE = basic
 REG_TEST_SELECT = all
 REG_TEST_DRYRUN = OFF
@@ -96,6 +97,10 @@ checkout_build:
 # Checkout the submodules required to build source codes
 	@+${MAKE} checkout SUBMODULE=yosys
 
+checkout_regtest:
+# Checkout the submodules required to build source codes
+	@+${MAKE} checkout SUBMODULE=etc/benchmarks/ubm
+
 prebuild:
 # Run cmake to generate Makefile under the build directory, before compilation
 	@mkdir -p ${BUILD_DIR} && \
@@ -119,6 +124,13 @@ list_cmake_targets: prebuild
 all: checkout_build
 # A shortcut command to run checkout and compile in serial
 	@+${MAKE} compile
+
+quick_test: checkout_regtest
+# Run a quick smoke test to test build results
+	echo "==== Quick test ===="
+	mkdir -p ${TMP_QUICK_TEST} && currDir=${PWD} && cd ${TMP_QUICK_TEST} && \
+	${currDir}/build/thirdparty/yosys/yosys ${currDir}/test/tcl_tmpl/quick_synth.ys && \
+	cd ${currDir} || exit 1;
 
 format-cpp:
 # Format all the C/C++ files under this project, excluding submodules
