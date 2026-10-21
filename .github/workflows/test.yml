@@ -127,10 +127,15 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - name: "Build Compatibility (GCC-13, Ubuntu 24.04)"
+          - name: "Build Compatibility (GCC, Ubuntu 24.04)"
             cc: gcc-13
             cxx: g++-13
             os: ubuntu-24.04
+            cmake_flags: "-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          - name: "Build Compatibility (GCC, Ubuntu 26.04)"
+            cc: gcc-15
+            cxx: g++-15
+            os: ubuntu-26.04
             cmake_flags: "-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
     # Define the steps to run the build job
     env:
