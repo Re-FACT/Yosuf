@@ -68,7 +68,14 @@ endif
 # Suggest to increase when the machine is slow in disk read/write
 REG_TEST_NEW_THREAD_WAIT_TIME=1
 
-NUM_JOBS := 8
+# Extract the integer from -j<int> or --jobs=<int> in MAKEFLAGS
+NUM_JOBS := $(shell echo "$(MAKEFLAGS)" | grep -oE -- '-j[0-9]+|--jobs=[0-9]+' | grep -oE '[0-9]+' | tail -n1)
+
+# If NUM_JOBS is found, pass it to cmake; otherwise, omit it 
+# (or let CMake auto-detect available CPU cores)
+ifeq ($(NUM_JOBS),)
+    NUM_JOBS=2
+endif
 
 # Put it first so that "make" without argument is like "make help".
 export COMMENT_EXTRACT
@@ -106,8 +113,8 @@ compile: prebuild
 #
 #   Define the target for cmake to compile. for example, ``cmake_goals=openfpga`` indicates that only openfpga binary will be compiled
 	echo "Building target(s): ${CMAKE_GOALS}" && \
-	echo "${CMAKE_COMMAND} --build ${BUILD_DIR} ${CMAKE_BUILD_CONFIG} --target ${CMAKE_GOALS} --parallel"
-	+${CMAKE_COMMAND} --build ${BUILD_DIR} ${CMAKE_BUILD_CONFIG} --target ${CMAKE_GOALS} --parallel
+	echo "${CMAKE_COMMAND} --build ${BUILD_DIR} ${CMAKE_BUILD_CONFIG} --target ${CMAKE_GOALS} ${PARALLEL_FLAG}"
+	+${CMAKE_COMMAND} --build ${BUILD_DIR} ${CMAKE_BUILD_CONFIG} --target ${CMAKE_GOALS} ${PARALLEL_FLAG}
 
 list_cmake_targets: prebuild
 # Show the targets available to be built, which can be specified through ``CMAKE_GOALS`` when compile
