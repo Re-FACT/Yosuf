@@ -59,7 +59,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 0 # Recommended to ensure full git history/tags are fetched
+      - name: Fix Submodule Path for Windows MSYS2
+        run: |
+          rm -rf thirdparty/yosys yosys .git/modules/thirdparty/yosys .git/modules/yosys || true
+          git submodule sync --recursive
+          git submodule update --init --force --recursive yosys
 
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
