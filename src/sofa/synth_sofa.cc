@@ -36,9 +36,9 @@ struct SynthSofaPass : public ScriptPass {
     log("        run synthesis for the specified Sofa architecture\n");
     log("        generate the synthesis netlist for the specified family.\n");
     log("        supported values:\n");
-    log("          " + string(SOFA_HD_DNAME) + "\n");
-    log("          " + string(QLSOFA_HD_DNAME) + "\n");
-    log("          " + string(SOFA_PLUS_HD_DNAME) + "\n");
+    log("          %s\n", STR(SOFA_HD_DNAME));
+    log("          %s\n", STR(QLSOFA_HD_DNAME));
+    log("          %s\n", STR(SOFA_PLUS_HD_DNAME));
     log("\n");
     log("    -blif <file>\n");
     log("        write the design to the specified BLIF file. Writing of an "
@@ -256,7 +256,7 @@ struct SynthSofaPass : public ScriptPass {
       };
 
       if (help_mode || family == SOFA_PLUS_HD_DNAME) {
-        if (help_mode || !nodsp) {
+        if (help_mode || inferDsp) {
           run("memory_dff", "                      (for sofa-plus)");
           if (!no_opt) {
             run("wreduce t:$mul", "                  (for sofa-plus)");
@@ -328,7 +328,7 @@ struct SynthSofaPass : public ScriptPass {
       /* Only support DFF triggered at rising edge and initialized to 0 */
       run("dfflegalize -cell $_DFF_PP0_ 0 ");
       run("techmap -map " + lib_path + family + "/dff_map.v");
-      run("dfflegalize -cell $_DFF_PP0_ 0);
+      run("dfflegalize -cell $_DFF_PP0_ 0");
       run("techmap -map " + lib_path + family + "/dff_map.v");
       run("opt_expr -mux_undef");
       run("simplemap");
@@ -373,12 +373,6 @@ struct SynthSofaPass : public ScriptPass {
       if (help_mode || !verilog_file.empty()) {
         run("write_verilog -noattr -nohex " +
             (help_mode ? "<file-name>" : verilog_file));
-      }
-    }
-
-    if (check_label("save_block_diagram", "(if -save_block_diagram)")) {
-      if (!block_diagram_file.empty()) {
-        run(stringf("show -format svg -prefix %s", block_diagram_file.c_str()));
       }
     }
   }
