@@ -69,6 +69,10 @@ endif
 # Suggest to increase when the machine is slow in disk read/write
 REG_TEST_NEW_THREAD_WAIT_TIME=1
 
+# Extract the -j value from MAKEFLAGS if present, otherwise default to empty (CMake will auto-detect)
+# This handles formats like '-j 4' or '-j4'
+JOBS_FLAGS := $(shell echo "$(MAKEFLAGS)" | grep -oE '\-j[0-9]*' | sed 's/\-j/--parallel /')
+
 # Put it first so that "make" without argument is like "make help".
 export COMMENT_EXTRACT
 
@@ -94,9 +98,9 @@ checkout_build:
 
 prebuild:
 # Run cmake to generate Makefile under the build directory, before compilation
-	@mkdir -p ${BUILD_DIR}
-	echo "cd ${BUILD_DIR} && ${CMAKE_COMMAND} ${CMAKE_FLAGS} ${SOURCE_DIR}"
-	cd ${BUILD_DIR} && ${CMAKE_COMMAND} ${CMAKE_FLAGS} ${SOURCE_DIR}
+	@mkdir -p ${BUILD_DIR} && \
+	echo "${CMAKE_COMMAND} -S ${SOURCE_DIR} -B ${BUILD_DIR} ${CMAKE_FLAGS}" && \
+	${CMAKE_COMMAND} -S ${SOURCE_DIR} -B ${BUILD_DIR} ${CMAKE_FLAGS}
 
 compile: prebuild
 # Compile the code base. By default, all the targets will be compiled
@@ -104,8 +108,9 @@ compile: prebuild
 # .. option:: CMAKE_GOALS
 #
 #   Define the target for cmake to compile. for example, ``cmake_goals=openfpga`` indicates that only openfpga binary will be compiled
-	echo "Building target(s): ${CMAKE_GOALS}"
-	@+${MAKE} -C ${BUILD_DIR} ${CMAKE_GOALS}
+	echo "Building target(s): ${CMAKE_GOALS}" && \
+	echo "${CMAKE_COMMAND} --build ${BUILD_DIR} ${CMAKE_BUILD_CONFIG} --target ${CMAKE_GOALS} ${JOB_FLAGS}" && \
+	${CMAKE_COMMAND} --build ${BUILD_DIR} ${CMAKE_BUILD_CONFIG} --target ${CMAKE_GOALS} ${JOB_FLAGS}
 
 list_cmake_targets: prebuild
 # Show the targets available to be built, which can be specified through ``CMAKE_GOALS`` when compile
