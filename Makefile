@@ -95,7 +95,7 @@ checkout_shallow:
 
 checkout_build:
 # Checkout the submodules required to build source codes
-	@+${MAKE} checkout SUBMODULE=yosys
+	@+${MAKE} checkout SUBMODULE=thirdparty/yosys
 
 checkout_regtest:
 # Checkout the submodules required to build source codes
@@ -129,7 +129,7 @@ quick_test: checkout_regtest
 # Run a quick smoke test to test build results
 	echo "==== Quick test ===="
 	currDir=$${PWD} && mkdir -p ${TMP_QUICK_TEST} && cd ${TMP_QUICK_TEST} && \
-	$${currDir}/build/yosys/yosys -m $${currDir}/build/yosys/yosys-sofa.so $${currDir}/test/tcl_tmpl/quick_synth.ys && \
+	$${currDir}/build/thirdparty/yosys/yosys -m $${currDir}/build/thirdparty/yosys/yosys-sofa.so $${currDir}/test/tcl_tmpl/quick_synth.ys && \
 	cd $${currDir} || exit 1;
 
 format-cpp:

@@ -17,7 +17,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # The submodule's CMakeLists.txt must define a target named `yosys` (the
 # executable); change YOSYS_TARGET if yours is called something else.
 # ---------------------------------------------------------------------------
-set(YOSYS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/yosys")
+set(YOSYS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/yosys")
 set(YOSYS_TARGET yosys CACHE STRING "Name of the Yosys executable target")
 
 # Options to enable/disable dependencies for yosys
