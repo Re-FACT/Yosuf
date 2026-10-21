@@ -11,7 +11,13 @@ set_target_properties(yosys-sofa PROPERTIES
   PREFIX ""
   CXX_VISIBILITY_PRESET default
 )
-target_include_directories(yosys-sofa PRIVATE "${YOSYS_SOURCE_DIR}")
+target_include_directories(yosys-sofa PRIVATE 
+  ${YOSYS_CMAKE_SOURCE_DIR}
+  ${YOSYS_CMAKE_BINARY_DIR}
+)
+target_compile_definitions(yosys-sofa PRIVATE 
+  _YOSYS_
+)
 add_dependencies(yosys-sofa ${YOSYS_TARGET})   # build Yosys first
 
 if(APPLE)
