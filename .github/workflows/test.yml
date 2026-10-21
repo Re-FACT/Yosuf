@@ -70,10 +70,6 @@ jobs:
             wget
             git
 
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
       - name: Fix Submodule Pointer for Windows MSYS2
         shell: msys2 {0} # Or your standard bash/msys2 shell block
         run: |
@@ -117,13 +113,13 @@ jobs:
           which python3
           python3 --version
 
-      - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-${{ hashFiles('**/CMakeLists.txt', '**/Makefile') }}
-          restore-keys: |
-            ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-
-            ${{ runner.os }}-msys2-${{ github.job }}-
+#      - name: ccache
+#        uses: hendrikmuhs/ccache-action@v1.2
+#        with:
+#          key: ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-${{ hashFiles('**/CMakeLists.txt', '**/Makefile') }}
+#          restore-keys: |
+#            ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-
+#            ${{ runner.os }}-msys2-${{ github.job }}-
 
       - name: Get number of CPU cores
         uses: SimenB/github-actions-cpu-cores@v3
