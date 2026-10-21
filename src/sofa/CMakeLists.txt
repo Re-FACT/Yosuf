@@ -25,16 +25,19 @@ if(APPLE)
 endif()
 
 # Copy the tech libs to yosys share directory
-add_custom_command(TARGET yosys-sofa POST_BUILD
+add_custom_command(
+    TARGET yosys-sofa
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${YOSYS_CMAKE_BINARY_DIR}/share/"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/sofa-hd"        # Source directory
-        "${YOSYS_CMAKE_BINARY_DIR}/share/"           # Destination directory (next to the built binary)
+        "${YOSYS_CMAKE_BINARY_DIR}/share/"           # Destination directory
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/qlsofa-hd"        # Source directory
-        "${YOSYS_CMAKE_BINARY_DIR}/share/"           # Destination directory (next to the built binary)
+        "${YOSYS_CMAKE_BINARY_DIR}/share/"           # Destination directory
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/sofa-plus-hd"        # Source directory
-        "${YOSYS_CMAKE_BINARY_DIR}/share/"           # Destination directory (next to the built binary)
+        "${YOSYS_CMAKE_BINARY_DIR}/share/"           # Destination directory
     COMMENT "Copying SOFA tech libs to Yosys shared directory"
 )
 
