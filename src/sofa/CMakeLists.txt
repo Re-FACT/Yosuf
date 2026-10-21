@@ -24,22 +24,21 @@ if(APPLE)
   target_link_options(yosys-sofa PRIVATE -undefined dynamic_lookup)
 endif()
 
-# Copy the tech libs to yosys share directory
-add_custom_command(
-    TARGET yosys-sofa
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${YOSYS_CMAKE_BINARY_DIR}/share/"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/sofa-hd"        # Source directory
-        "${YOSYS_CMAKE_BINARY_DIR}/share/"           # Destination directory
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/qlsofa-hd"        # Source directory
-        "${YOSYS_CMAKE_BINARY_DIR}/share/"           # Destination directory
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/sofa-plus-hd"        # Source directory
-        "${YOSYS_CMAKE_BINARY_DIR}/share/"           # Destination directory
-    COMMENT "Copying SOFA tech libs to Yosys shared directory"
-)
+# Define the list of tech libraries
+set(TECH_LIBS "sofa-hd" "qlsofa-hd" "sofa-plus-hd")
+
+# Loop to create three separate custom commands attached to the target
+foreach(LIB_NAME ${TECH_LIBS})
+    add_custom_command(
+        TARGET yosys-sofa
+        POST_BUILD
+        # This will safely run for each folder; copy_directory auto-creates missing paths
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/${LIB_NAME}"
+            "${YOSYS_CMAKE_BINARY_DIR}/share/${LIB_NAME}"
+        COMMENT "Copying ${LIB_NAME} to Yosys shared directory"
+    )
+endforeach()
 
 # ---------------------------------------------------------------------------
 # Install (cmake --install build --prefix <dir>)
@@ -47,9 +46,8 @@ add_custom_command(
 include(GNUInstallDirs)
 install(TARGETS yosys-sofa
         LIBRARY DESTINATION "${CMAKE_INSTALL_BINDIR}")
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/sofa-hd
-        DESTINATION "${CMAKE_INSTALL_DATADIR}")
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/qlsofa-hd
-        DESTINATION "${CMAKE_INSTALL_DATADIR}")
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/sofa-plus-hd
-        DESTINATION "${CMAKE_INSTALL_DATADIR}")
+# Loop to create three separate custom commands attached to the target
+foreach(LIB_NAME ${TECH_LIBS})
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${LIB_NAME}
+          DESTINATION ${CMAKE_INSTALL_DATADIR}/yosys/${LIB_NAME})
+endforeach()
