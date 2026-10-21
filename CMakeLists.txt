@@ -37,7 +37,7 @@ else()
 endif()
 list(APPEND CMAKE_MODULE_PATH ${YOSYS_SOURCE_DIR}/cmake)
 # Now include yosys with the settings above
-add_subdirectory(yosys)
+add_subdirectory(thirdparty/yosys)
 
 if(NOT TARGET ${YOSYS_TARGET})
   message(FATAL_ERROR
