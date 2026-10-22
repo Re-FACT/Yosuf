@@ -25,7 +25,7 @@ pacman -S --noconfirm --needed \
     flex \
     mingw-w64-ucrt-x86_64-fontconfig \
     gdb \
-    git \
+    mingw-w64-ucrt-x86_64-git \
     gperf \
     mingw-w64-ucrt-x86_64-iverilog \
     mingw-w64-ucrt-x86_64-cairo \
