@@ -41,6 +41,10 @@ else()
   set(YOSYS_COMPILER_LAUNCHER ${CCACHE_PROGRAM} CACHE STRING "Compiler launcher being consistent with parent project")
 endif()
 list(APPEND CMAKE_MODULE_PATH ${YOSYS_SOURCE_DIR}/cmake)
+# For Msys2 
+if (DEFINED ENV{MSYSTEM})
+  set_target_properties(yosys PROPERTIES LINK_FLAGS "-Wl,--export-all-symbols")
+endif()
 # Now include yosys with the settings above
 add_subdirectory(thirdparty/yosys)
 
