@@ -120,7 +120,7 @@ jobs:
       - name: Show build tree
         shell: msys2 {0}
         run: |
-          tree build
+          tree build -L 3
 
       - name: Quick test
         shell: msys2 {0}
