@@ -29,6 +29,11 @@ set(YOSYS_ENABLE_COVERAGE OFF CACHE BOOL "Enable coverage test in yosys")
 set(YOSYS_ENABLE_PROFILING OFF CACHE BOOL "Enable profiling in compiled yosys")
 set(YOSYS_ENABLE_UNIT_TESTS OFF CACHE BOOL "Disable unit tests in compiled yosys")
 set(YOSYS_ENABLE_FUNCTIONAL_TESTS OFF CACHE BOOL "Disable functional tests in compiled yosys")
+# Refer to https://github.com/YosysHQ/yosys/blob/dd83bbad28b61f244e1ae00639d85a07c2a5c95f/.github/workflows/test-build.yml#L96
+set(YOSYS_USE_BUNDLED_LIBS OFF CACHE BOOL "Use bundled third-party libraries")
+if(DEFINED ENV{MSYSTEM})
+  set(BUILD_SHARED_LIBS OFF)
+endif()
 # Yosys inherit ccache setting from parent project
 if(CMAKE_CXX_COMPILER_LAUNCHER)
   set(YOSYS_COMPILER_LAUNCHER ${CMAKE_CXX_COMPILER_LAUNCHER} CACHE STRING "Compiler launcher being consistent with parent project")
