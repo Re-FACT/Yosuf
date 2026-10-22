@@ -55,9 +55,6 @@ jobs:
       CC: ${{ matrix.config.cc }}
       CXX: ${{ matrix.config.cxx }}
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
         with:
@@ -67,6 +64,10 @@ jobs:
           install: >-
             wget
             git
+            make
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       #In MSYS2, the flex package is an MSYS-native tool, meaning it installs its headers to /usr/include/FlexLexer.h. However, if you are using a MinGW-w64 environment (e.g., UCRT64, MINGW64), the compiler only looks for headers in /mingw64/include or similar toolchain-specific paths. The most common workaround is to copy or link the header from the MSYS directory to your active MinGW-w64 include directory. 
       - name: Install dependencies
@@ -94,13 +95,13 @@ jobs:
           which python3
           python3 --version
 
-#      - name: ccache
-#        uses: hendrikmuhs/ccache-action@v1.2
-#        with:
-#          key: ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-${{ hashFiles('**/CMakeLists.txt', '**/Makefile') }}
-#          restore-keys: |
-#            ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-
-#            ${{ runner.os }}-msys2-${{ github.job }}-
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-${{ hashFiles('**/CMakeLists.txt', '**/Makefile') }}
+          restore-keys: |
+            ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-
+            ${{ runner.os }}-msys2-${{ github.job }}-
 
       - name: Get number of CPU cores
         uses: SimenB/github-actions-cpu-cores@v3
@@ -111,6 +112,7 @@ jobs:
         env:
           CCACHE_DIR: ${{ github.workspace }}/.ccache
         run: |
+          cat .git/modules/thirdparty/yosys/HEAD
           make all BUILD_TYPE=$BUILD_TYPE -j${{ steps.cpu-cores.outputs.count}}
 
       - name: Quick test
