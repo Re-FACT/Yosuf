@@ -18,6 +18,7 @@ target_include_directories(yosys-sofa PRIVATE
 target_compile_definitions(yosys-sofa PRIVATE 
   _YOSYS_
 )
+target_link_libraries(yosys-sofa PRIVATE libyosys)
 add_dependencies(yosys-sofa ${YOSYS_TARGET})   # build Yosys first
 
 if(APPLE)
