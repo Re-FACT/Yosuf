@@ -115,7 +115,7 @@ jobs:
           CCACHE_DIR: ${{ github.workspace }}/.ccache
         run: |
           cat .git/modules/thirdparty/yosys/HEAD
-          make all BUILD_TYPE=$BUILD_TYPE -j${{ steps.cpu-cores.outputs.count}}
+          make compile BUILD_TYPE=$BUILD_TYPE -j${{ steps.cpu-cores.outputs.count}}
 
       - name: Quick test
         shell: msys2 {0}
