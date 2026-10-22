@@ -1,0 +1,255 @@
+name: Test
+
+# Run CI on push, PR, and weekly.
+
+on:
+  push:
+    branches:
+      - main
+    path-ignore: # Prevent from running if only docs are updated
+      - 'docs/**'
+      - '**/*README*'
+      - '**.md'
+      - '**.rst'
+  pull_request:
+    branches:
+      - main
+    path-ignore: # Prevent from running if only docs are updated
+      - 'docs/**'
+      - '**/*README*'
+      - '**.md'
+      - '**.rst'
+  schedule:
+    - cron: "0 0 * * 0 " # weekly
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Environment variables
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: release
+
+# Multiple job to tests
+jobs:
+  # Test the compilation compatibility
+  win_build:
+    name: ${{ matrix.config.name }}
+    runs-on: windows-latest
+    # Branch on different OS and settings
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: "Build Compatibility (GCC, Windows Msys2)"
+            cc: gcc
+            cxx: g++
+            os: UCRT64
+    defaults:
+      run:
+        # This ensures all 'run' steps use the MSYS2 bash shell by default
+        shell: msys2 {0}
+    # Define the steps to run the build job
+    env:
+      CC: ${{ matrix.config.cc }}
+      CXX: ${{ matrix.config.cxx }}
+    steps:
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.config.os }}
+          update: true
+          # Optional: Pre-install core tools needed to run your script
+          install: >-
+            wget
+            git
+            make
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      #In MSYS2, the flex package is an MSYS-native tool, meaning it installs its headers to /usr/include/FlexLexer.h. However, if you are using a MinGW-w64 environment (e.g., UCRT64, MINGW64), the compiler only looks for headers in /mingw64/include or similar toolchain-specific paths. The most common workaround is to copy or link the header from the MSYS directory to your active MinGW-w64 include directory. 
+      - name: Install dependencies
+        run: |
+          ./.github/workflows/build_dependency_win-msys2-${{ matrix.config.os}}.sh
+          cp /usr/include/FlexLexer.h /mingw64/include/
+          cp /usr/include/FlexLexer.h /ucrt64/include/
+          python3 -m venv myenv
+          source myenv/bin/activate
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+          echo "==== Checking python packages ===="
+          python -c "import yaml; print('Installed')"      
+
+      - name: Dump tool versions
+        run: |
+          which cmake
+          cmake --version
+          which ${CC}
+          ${CC} --version
+          which ${CXX}
+          ${CXX} --version
+          which ld
+          ld --version
+          which python3
+          python3 --version
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-${{ hashFiles('**/CMakeLists.txt', '**/Makefile') }}
+          restore-keys: |
+            ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-
+            ${{ runner.os }}-msys2-${{ github.job }}-
+
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v3
+        id: cpu-cores
+
+      - name: Build
+        shell: msys2 {0}
+        env:
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+        run: |
+          cat .git/modules/thirdparty/yosys/HEAD
+          make compile BUILD_TYPE=$BUILD_TYPE -j${{ steps.cpu-cores.outputs.count}}
+
+      - name: Quick test
+        shell: msys2 {0}
+        run: |
+          make quick_test
+
+  # Test the compilation compatibility
+  ubuntu_build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    # Branch on different OS and settings
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: "Build Compatibility (GCC, Ubuntu 24.04)"
+            cc: gcc-13
+            cxx: g++-13
+            os: ubuntu-24.04
+            cmake_flags: "-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          - name: "Build Compatibility (GCC, Ubuntu 26.04)"
+            cc: gcc-15
+            cxx: g++-15
+            os: ubuntu-26.04
+            cmake_flags: "-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+    # Define the steps to run the build job
+    env:
+      CC: ${{ matrix.config.cc }}
+      CXX: ${{ matrix.config.cxx }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo bash ./.github/workflows/build_dependency_ubuntu.sh
+      
+      - name: Dump tool versions
+        run: |
+          cmake --version
+          ${CC} --version
+          ${CXX} --version
+          python3 --version
+
+      - uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          # Generates a unique key based on the specific job and matrix parameters
+          key: ${{ github.job }}-${{ runner.os }}-${{ matrix.config.cc}}
+          # Defines the fallback prefix if an exact match is missing
+          restore-keys: |
+            ${{ github.job }}-${{ runner.os }}-
+
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v3
+        id: cpu-cores
+
+      - name: Build
+        shell: bash
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          make all BUILD_TYPE=$BUILD_TYPE -j${{ steps.cpu-cores.outputs.count}}
+
+      - name: Quick test
+        run: |
+          make quick_test
+
+  # Test the compilation compatibility
+  macos_build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    # Branch on different OS and settings
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: "Build (Clang, MacOS 15)"
+            os: macos-15
+            cc: clang
+            cxx: clang++
+            cmake_flags: "-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          - name: "Build (Clang, MacOS 26)"
+            os: macos-26
+            cc: clang
+            cxx: clang++
+            cmake_flags: "-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+    # Define the steps to run the build job
+    env:
+      CC: ${{ matrix.config.cc }}
+      CXX: ${{ matrix.config.cxx }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Show build environment
+        run: |
+          sw_vers
+          uname -m
+          xcodebuild -version
+          clang --version
+          clang++ --version
+          cmake --version
+          ninja --version
+
+      - name: Install dependencies
+        run: |
+          ./.github/workflows/build_dependency_macos.sh
+          python3 -m venv myenv
+          source myenv/bin/activate
+          python3 -m pip install --upgrade pip setuptools
+          python3 -m pip install -r requirements.txt
+          echo "==== Checking python packages ===="
+          python -c "import yaml; print('Installed')"      
+          echo "---- Sleep 10 seconds before copy file consider system glitching ----"
+          sleep 10s
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-macos-${{ github.job }}-${{ matrix.config.prefix }}-${{ hashFiles('**/CMakeLists.txt', '**/Makefile') }}
+          restore-keys: |
+            ${{ runner.os }}-macos-${{ github.job }}-${{ matrix.config.prefix }}-
+            ${{ runner.os }}-macos-${{ github.job }}-
+
+      - name: Get number of CPU cores
+        uses: SimenB/github-actions-cpu-cores@v3
+        id: cpu-cores
+
+      - name: Build
+        env:
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+        run: |
+          make all BUILD_TYPE=$BUILD_TYPE CMAKE_FLAGS="${{ matrix.config.cmake_flags }}" -j${{ steps.cpu-cores.outputs.count}}
+
+      - name: Quick test
+        run: |
+          make quick_test
+

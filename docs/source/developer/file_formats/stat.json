@@ -1,0 +1,39 @@
+{
+   "creator": "Yosys 0.44+60 (git sha1 4ad9001cb, g++ 11.4.0-1ubuntu1~22.04 -fPIC -O3)",
+   "invocation": "stat -json -top and2_latch ",
+   "modules": {
+      "\\and2_latch": {
+         "num_wires":         5,
+         "num_wire_bits":     5,
+         "num_pub_wires":     5,
+         "num_pub_wire_bits": 5,
+         "num_ports":         5,
+         "num_port_bits":     5,
+         "num_memories":      0,
+         "num_memory_bits":   0,
+         "num_processes":     0,
+         "num_cells":         2,
+         "num_cells_by_type": {
+            "$lut": 1,
+            "dff": 1
+         }
+      }
+   },
+      "design": {
+         "num_wires":         5,
+         "num_wire_bits":     5,
+         "num_pub_wires":     5,
+         "num_pub_wire_bits": 5,
+         "num_ports":         5,
+         "num_port_bits":     5,
+         "num_memories":      0,
+         "num_memory_bits":   0,
+         "num_processes":     0,
+         "num_cells":         2,
+         "num_cells_by_type": {
+            "$lut": 1,
+            "dff": 1
+         }
+      }
+}
+

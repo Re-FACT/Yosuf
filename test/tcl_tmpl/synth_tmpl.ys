@@ -1,0 +1,8 @@
+# Load the yosuf plugin (shared lib)
+plugin -i yosys-sofa.so
+# Read verilog
+read_verilog ../../ubm/simple_gates/and2/and2.v
+# Run synthesis
+synth_sofa -top and2 -family sofa-hd -blif and2.blif -verilog and2_post_synth.v
+# Reports
+tee -o stats.json stat -json

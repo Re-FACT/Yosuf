@@ -10,10 +10,6 @@
 #
 #  Pick the type of compilation. Can be either ``release`` or ``debug``. By default, release mode is selected (full optimization on runtime).
 #
-# .. option:: EDITION_TYPE=<string>
-#
-#  Pick the type of edition. Can be either ``engineering`` or ``production``. By default, production mode is selected (only HDL-to-Bitstream design flow supported).
-#
 # .. option:: CMAKE_FLAGS=<string>
 #
 #  Force compilation flags for CMake to generate Makefiles
@@ -26,7 +22,7 @@ CMAKE_BUILD_TYPE := $(shell echo ${BUILD_TYPE} | sed 's/_\?pgo//' | sed 's/_\?st
 
 # Allow users to pass parameters to cmake, without defining build types
 # e.g. make CMAKE_FLAGS="-DCMAKE_CXX_COMPILER=g++-9'
-override CMAKE_FLAGS := -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DARKANGEL_EDITION_TYPE=${EDITION_TYPE} -G 'Unix Makefiles' ${CMAKE_FLAGS}
+override CMAKE_FLAGS := -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -G 'Unix Makefiles' ${CMAKE_FLAGS}
 
 # -s : Suppresss makefile output (e.g. entering/leaving directories)
 # --output-sync target : For parallel compilation ensure output for each target is synchronized (make version >= 4.0)
@@ -37,7 +33,6 @@ SOURCE_DIR :=${PWD}
 BUILD_DIR ?= build
 CMAKE_GOALS = all
 SUBMODULE=
-NUM_JOBS = 8
 
 # Find CMake command from system variable, otherwise use a default one
 ifeq ($(origin CMAKE_COMMAND),undefined)
@@ -59,6 +54,7 @@ FORCE_COMMIT_VERSION_UPDATE = off
 INFRA_ROOT = ${PWD}/utils/refact_infra/
 
 # Reg test options
+TMP_QUICK_TEST = _tmp_quick_test
 REG_TEST_TYPE = basic
 REG_TEST_SELECT = all
 REG_TEST_DRYRUN = OFF
@@ -68,6 +64,15 @@ REG_TEST_FLAGS += --dryrun
 endif
 # Suggest to increase when the machine is slow in disk read/write
 REG_TEST_NEW_THREAD_WAIT_TIME=1
+
+# Extract the integer from -j<int> or --jobs=<int> in MAKEFLAGS
+NUM_JOBS := $(shell echo "$(MAKEFLAGS)" | grep -oE -- '-j[0-9]+|--jobs=[0-9]+' | grep -oE '[0-9]+' | tail -n1)
+
+# If NUM_JOBS is found, pass it to cmake; otherwise, omit it 
+# (or let CMake auto-detect available CPU cores)
+ifeq ($(NUM_JOBS),)
+    NUM_JOBS=2
+endif
 
 # Put it first so that "make" without argument is like "make help".
 export COMMENT_EXTRACT
@@ -92,11 +97,15 @@ checkout_build:
 # Checkout the submodules required to build source codes
 	@+${MAKE} checkout SUBMODULE=thirdparty/yosys
 
+checkout_regtest:
+# Checkout the submodules required to build source codes
+	@+${MAKE} checkout SUBMODULE=etc/benchmarks/ubm
+
 prebuild:
 # Run cmake to generate Makefile under the build directory, before compilation
-	@mkdir -p ${BUILD_DIR}
-	echo "cd ${BUILD_DIR} && ${CMAKE_COMMAND} ${CMAKE_FLAGS} ${SOURCE_DIR}"
-	cd ${BUILD_DIR} && ${CMAKE_COMMAND} ${CMAKE_FLAGS} ${SOURCE_DIR}
+	@mkdir -p ${BUILD_DIR} && \
+	echo "${CMAKE_COMMAND} -S ${SOURCE_DIR} -B ${BUILD_DIR} ${CMAKE_FLAGS}" && \
+	${CMAKE_COMMAND} -S ${SOURCE_DIR} -B ${BUILD_DIR} ${CMAKE_FLAGS}
 
 compile: prebuild
 # Compile the code base. By default, all the targets will be compiled
@@ -104,20 +113,28 @@ compile: prebuild
 # .. option:: CMAKE_GOALS
 #
 #   Define the target for cmake to compile. for example, ``cmake_goals=openfpga`` indicates that only openfpga binary will be compiled
-	echo "Building target(s): ${CMAKE_GOALS}"
-	@+${MAKE} -C ${BUILD_DIR} ${CMAKE_GOALS}
+	echo "Building target(s): ${CMAKE_GOALS}" && \
+	echo "${CMAKE_COMMAND} --build ${BUILD_DIR} ${CMAKE_BUILD_CONFIG} --target ${CMAKE_GOALS} ${PARALLEL_FLAG}"
+	+${CMAKE_COMMAND} --build ${BUILD_DIR} ${CMAKE_BUILD_CONFIG} --target ${CMAKE_GOALS} ${PARALLEL_FLAG}
 
 list_cmake_targets: prebuild
 # Show the targets available to be built, which can be specified through ``CMAKE_GOALS`` when compile
 	cd ${BUILD_DIR} && make help && cd -
 
-all: checkout_all
+all: checkout_build
 # A shortcut command to run checkout and compile in serial
 	@+${MAKE} compile
 
+quick_test: checkout_regtest
+# Run a quick smoke test to test build results
+	echo "==== Quick test ===="
+	currDir=$${PWD} && mkdir -p ${TMP_QUICK_TEST} && cd ${TMP_QUICK_TEST} && \
+	$${currDir}/build/thirdparty/yosys/yosys -m $${currDir}/build/thirdparty/yosys/yosys-sofa.so $${currDir}/test/tcl_tmpl/quick_synth.ys && \
+	cd $${currDir} || exit 1;
+
 format-cpp:
 # Format all the C/C++ files under this project, excluding submodules
-	for f in `find libs/lib* core -iname *.cpp -o -iname *.hpp -o -iname *.c -o -iname *.h`; \
+	for f in `find core -iname *.cpp -o -iname *.hpp -o -iname *.c -o -iname *.h`; \
 	do \
 	${CLANG_FORMAT_EXEC} --style=file -i $${f} || exit 1; \
 	done

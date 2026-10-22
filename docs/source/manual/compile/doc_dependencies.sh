@@ -1,0 +1,1 @@
+../../../../.github/workflows/doc_dependency.sh
