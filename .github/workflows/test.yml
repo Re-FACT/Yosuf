@@ -122,6 +122,16 @@ jobs:
         run: |
           tree build -L 3
 
+      - name: Check plugin dll
+        shell: msys2 {0}
+        run: |
+          objjump -p ./build/thirdparty/yosys/yosys-sofa.dll | grep "DLL Name"
+
+      - name: Check plugin load
+        shell: msys2 {0}
+        run: |
+          ./build/thirdparty/yosys/yosys -Q -p "plugin -i ./build/thirdparty/yosys/yosys-sofa.dll; help synth-sofa"
+
       - name: Quick test
         shell: msys2 {0}
         run: |
