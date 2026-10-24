@@ -20,7 +20,7 @@ target_compile_definitions(yosys-sofa PRIVATE
 )
 add_dependencies(yosys-sofa ${YOSYS_TARGET})   # build Yosys first
 if (DEFINED ENV{MSYSTEM})
-  target_link_libraries(yosys-sofa PRIVATE libyosys)
+  target_link_libraries(yosys-sofa PRIVATE ${YOSYS_TARGET})
 endif()
 # MacOS require specific linker settings
 if(APPLE)
