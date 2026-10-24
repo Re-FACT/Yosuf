@@ -22,7 +22,9 @@ PRIVATE_NAMESPACE_BEGIN
 struct SynthSofaPass : public ScriptPass {
 
   SynthSofaPass()
-      : ScriptPass(STR(PASS_NAME), "Synthesis for Sofa FPGAs") {}
+      : ScriptPass(STR(PASS_NAME), "Synthesis for Sofa FPGAs") {
+    log("SOFA: SynthSofaPass constructor executed\n");
+  }
 
   void help() override {
     log("\n");
