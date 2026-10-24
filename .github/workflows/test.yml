@@ -125,7 +125,7 @@ jobs:
       - name: Check plugin dll
         shell: msys2 {0}
         run: |
-          objjump -p ./build/thirdparty/yosys/yosys-sofa.dll | grep "DLL Name"
+          objdump -p ./build/thirdparty/yosys/yosys-sofa.dll | grep "DLL Name"
 
       - name: Check plugin load
         shell: msys2 {0}
