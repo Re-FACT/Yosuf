@@ -43,6 +43,11 @@ endif()
 list(APPEND CMAKE_MODULE_PATH ${YOSYS_SOURCE_DIR}/cmake)
 # Now include yosys with the settings above
 add_subdirectory(thirdparty/yosys)
+# Force Yosys to output static libs in Msys2 on Windows
+if (DEFINED ENV{MSYSTEM})
+  set_target_properties(${YOSYS_TARGET} PROPERTIES ENABLE_EXPORTS TRUE)
+#  set_target_properties(yosys PROPERTIES LINK_FLAGS "-Wl,--export-all-symbols")
+endif()
 
 if(NOT TARGET ${YOSYS_TARGET})
   message(FATAL_ERROR

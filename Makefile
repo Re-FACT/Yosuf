@@ -53,6 +53,13 @@ VERSION_BUMP_TYPE = minor
 FORCE_COMMIT_VERSION_UPDATE = off
 INFRA_ROOT = ${PWD}/utils/refact_infra/
 
+# Detect operating system and use proper name
+ifeq ($(OS),Windows_NT)
+    YOSYS_PLUGIN_POSTFIX = .dll
+else
+    YOSYS_PLUGIN_POSTFIX = .so
+endif
+
 # Reg test options
 TMP_QUICK_TEST = _tmp_quick_test
 REG_TEST_TYPE = basic
@@ -129,7 +136,7 @@ quick_test: checkout_regtest
 # Run a quick smoke test to test build results
 	echo "==== Quick test ===="
 	currDir=$${PWD} && mkdir -p ${TMP_QUICK_TEST} && cd ${TMP_QUICK_TEST} && \
-	$${currDir}/build/thirdparty/yosys/yosys -m $${currDir}/build/thirdparty/yosys/yosys-sofa.so $${currDir}/test/tcl_tmpl/quick_synth.ys && \
+	$${currDir}/build/thirdparty/yosys/yosys -m $${currDir}/build/thirdparty/yosys/yosys-sofa${YOSYS_PLUGIN_POSTFIX} $${currDir}/test/tcl_tmpl/quick_synth.ys && \
 	cd $${currDir} || exit 1;
 
 format-cpp:

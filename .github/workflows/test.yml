@@ -100,9 +100,9 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-${{ hashFiles('**/CMakeLists.txt', '**/Makefile') }}
+          key: ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}
           restore-keys: |
-            ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}-
+            ${{ runner.os }}-msys2-${{ github.job }}-${{ matrix.config.prefix }}
             ${{ runner.os }}-msys2-${{ github.job }}-
 
       - name: Get number of CPU cores
@@ -116,6 +116,21 @@ jobs:
         run: |
           cat .git/modules/thirdparty/yosys/HEAD
           make compile BUILD_TYPE=$BUILD_TYPE -j${{ steps.cpu-cores.outputs.count}}
+
+      - name: Show build tree
+        shell: msys2 {0}
+        run: |
+          tree build -L 3
+
+      - name: Check plugin dll
+        shell: msys2 {0}
+        run: |
+          objdump -p ./build/thirdparty/yosys/yosys-sofa.dll | grep "DLL Name"
+
+      - name: Check plugin load
+        shell: msys2 {0}
+        run: |
+          ./build/thirdparty/yosys/yosys -Q -p "plugin -i ./build/thirdparty/yosys/yosys-sofa.dll; help synth-sofa"
 
       - name: Quick test
         shell: msys2 {0}

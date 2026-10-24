@@ -16,6 +16,8 @@ pacman -S --noconfirm --needed \
     bison \
     ccache \
     base-devel \
+    tree \
+    mingw-w64-ucrt-x86_64-binutils \
     mingw-w64-ucrt-x86_64-autotools \
     mingw-w64-ucrt-x86_64-cmake \
     mingw-w64-ucrt-x86_64-toolchain \
