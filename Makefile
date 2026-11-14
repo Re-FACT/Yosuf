@@ -107,6 +107,7 @@ checkout_build:
 checkout_regtest:
 # Checkout the submodules required to build source codes
 	@+${MAKE} checkout SUBMODULE=etc/benchmarks/ubm
+	@+${MAKE} checkout SUBMODULE=test/ezreg
 
 prebuild:
 # Run cmake to generate Makefile under the build directory, before compilation
