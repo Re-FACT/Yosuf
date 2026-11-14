@@ -165,6 +165,9 @@ struct SynthSofaPass : public ScriptPass {
     } else if (family == QLSOFA_HD_DNAME) {
       inferAdder = true;
       inferDsp = false;
+    } else if (family == SOFA_PLUS_HD_DNAME) {
+      inferAdder = true;
+      inferDsp = true;
     }
     /* By default, no opt should be enabled. Throw a warning if not */
     if (no_opt) {
