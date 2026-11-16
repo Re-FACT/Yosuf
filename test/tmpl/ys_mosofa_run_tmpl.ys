@@ -1,0 +1,7 @@
+# Load the yosuf plugin (shared lib) through -m option. No need to load plugin here
+# Read verilog
+read_verilog ${DESIGN_INPUTS}
+# Run synthesis
+synth_mosofa -top ${TOP_MODULE} -family mosofa-h -blif ${TOP_MODULE}.blif -verilog ${DESIGN_OUTPUT}
+# Reports
+tee -o ${RESOURCE_REPORT} stat -json

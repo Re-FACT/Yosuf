@@ -1,0 +1,18 @@
+# Define the metrics to be extracted from a json file
+# name: the name of the metric to be shown in final report
+# keyword: the hierarchy in the json content. Use '/' as the splitter in hierarchy. For example, the 'design/num_cells_by_type/$lut', indicate the json file tree: 
+# { 
+#   "design": {
+#     "num_cells_by_type": {
+#        "$lut": 33
+#     }
+#   }
+# }
+#
+# upper_bound: the upper bound in the value of the metric that can be tolerated during Qor check. Must be a positive number. For example, 0.3 indicates that Qor check can pass when the value is lower than 130% of the golden value
+# lower_bound: the lower bound in the value of the metric that can be tolerated during Qor check. Must be a positive number. For example, 0.3 indicates that Qor check can pass when the value is above 70% of the golden value
+metric:
+ - name: num_of_lut
+   keyword: "design/num_cells_by_type/$lut"
+   upper_bound: 0.3
+   lower_bound: 0.3

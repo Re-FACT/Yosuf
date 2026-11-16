@@ -1,0 +1,16 @@
+# Error keyword to extract from lines in a plain-text file, for example, a log file
+# name: the name of the keyword
+# ignore_case: if the regular expression should be case sensitive
+# regex: the regular expression to match
+# If any match is found, it indicates an error found in the file
+keywords:
+  - name: "Regular error"
+    ignore_case: true
+    regex: "^Error"
+  - name: "Failures"
+    ignore_case: true
+    regex: "^Fail [^0]"
+  - name: "SegFault"
+    regex: "^Segmentation fault"
+  - name: "Assertation"
+    regex: "^Asseration.*failed"
