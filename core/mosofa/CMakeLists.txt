@@ -37,7 +37,7 @@ add_custom_command(
 )
 
 # Define the list of tech libraries
-set(TECH_LIBS "mosofa")
+set(TECH_LIBS "mosofa-h")
 # Create the subdir before copy
 add_custom_command(
     TARGET yosys-mosofa
