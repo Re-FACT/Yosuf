@@ -40,7 +40,6 @@ pacman -S --noconfirm --needed \
     mingw-w64-ucrt-x86_64-make \
     perl \
     mingw-w64-ucrt-x86_64-pkg-config \
-    mingw-w64-ucrt-x86_64-python3 \
     mingw-w64-ucrt-x86_64-python \
     mingw-w64-ucrt-x86_64-python-pip \
     mingw-w64-ucrt-x86_64-flexdll \
