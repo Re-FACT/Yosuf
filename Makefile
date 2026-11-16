@@ -191,8 +191,8 @@ check-format-yaml:
 # Check if all the YAML files are in the expected format
 	${INFRA_ROOT}/scripts/check-format.sh -yaml
 
-format-all: format-cpp format-xml format-py format-yaml
-# Format all the C/C++, XML and Python codes
+format-all: format-cpp format-yaml
+# Format all the C/C++ and YAML codes
 
 update_version:
 # Update the patch count in the version number
