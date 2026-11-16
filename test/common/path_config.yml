@@ -8,9 +8,9 @@
 #   var_name: "[BENCHMARK_ROOT]/and2/and2.v"
 # The value of the var_name will be
 #   /home/xtang/etc/benchmarks/and2/and2.v
-benchmark_root: "[ROOT_PATH]/tests/benchmarks"
-template_root: "[ROOT_PATH]/tests/tmpl"
-task_root: "[ROOT_PATH]/tests/tasks"
-req_root: "[ROOT_PATH]/tests/requirements"
+benchmark_root: "[ROOT_PATH]/etc/benchmarks"
+template_root: "[ROOT_PATH]/test/tmpl"
+task_root: "[ROOT_PATH]/test/tasks"
+req_root: "[ROOT_PATH]/test/requirements"
 yosys_bin_path: "[ROOT_PATH]/build/thirdparty/yosys/yosys"
 mosofa_plugin_path: "[ROOT_PATH]/build/thirdparty/yosys/yosys-mosofa"

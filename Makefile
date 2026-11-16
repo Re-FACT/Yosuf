@@ -237,7 +237,7 @@ quick_test: checkout_regtest
 	cd $${currDir} || exit 1;
 
 reg_test:
-# Run regression tests with pre-installed tools. Use CHECK_QOR=ON to enable qor check. Use REG_TEST_DRYRUN=OFF to enable dryrun mode. Use REG_TEST_SELECT=<string> to selectly run testcase. Use REG_TEST_TASK=[mosofa_test] to pick regression tasks
+# Run regression tests with pre-installed tools. Use CHECK_QOR=ON to enable qor check. Use REG_TEST_DRYRUN=ON to enable dryrun mode. Use REG_TEST_SELECT=<string> to selectly run testcase. Use REG_TEST_TASK=[mosofa_test] to pick regression tasks
 	echo "==== Regression test ===="
 	${PYTHON_EXEC} test/ezreg/scripts/run_ezreg_test.py \
 	--path_config test/common/path_config.yml \

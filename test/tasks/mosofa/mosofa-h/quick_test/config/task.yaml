@@ -7,7 +7,7 @@ and2:
     path: "[TEMPLATE_ROOT]/ys_mosofa_run_tmpl.ys"
     multiple_line_replaced_variables: 
       design_inputs:
-        - "[BENCHMARK_ROOT]/and2x2/and2.v"
+        - "[BENCHMARK_ROOT]/ubm/simple_gates/and2/and2.v"
     single_line_replaced_variables: 
       design_output: "and2_post_synth.v"
       top_module: "[current_design]"
