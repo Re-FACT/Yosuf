@@ -1,0 +1,7 @@
+# task configuration
+reg_tasks:
+  - name: mosofa-h_quick_test
+    workspace: "[TASK_ROOT]/mosofa/mosofa-h/quick_test/_work"
+    subtasks: "[TASK_ROOT]/mosofa/mosofa-h/quick_test/config/task.yaml" 
+    # If there are golden results, pass checks can be performed
+    golden_result: "[TASK_ROOT]/mosofa/mosofa-h/quick_test/config/golden.csv"

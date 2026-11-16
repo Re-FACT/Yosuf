@@ -41,8 +41,26 @@ else
 CMAKE_COMMAND := ${CMAKE_COMMAND}
 endif
 
+# Configure python
+PYTHON_EXEC=python3
+# Cross-platform Python interpreter selection.
+# Checks for a local .venv first to ensure isolated dependencies are used
+# regardless of shell PATH ordering or OS differences.
+ifneq ("$(wildcard .venv/Scripts/python.exe)","")
+  # Windows virtual environment path
+  PYTHON_EXEC := .venv/Scripts/python.exe
+else ifneq ("$(wildcard .venv/bin/python)","")
+  # Linux and macOS virtual environment path
+  PYTHON_EXEC := .venv/bin/python
+else ifeq ($(OS),Windows_NT)
+  # Fallback to system Python on Windows (avoids Microsoft Store python3 stub)
+  PYTHON_EXEC := python
+else
+  # Fallback to standard Python 3 on Linux and macOS
+  PYTHON_EXEC := python3
+endif
+
 # Define executables
-PYTHON_EXEC ?= python3
 CLANG_FORMAT_EXEC ?= clang-format
 XML_FORMAT_EXEC ?= xmllint
 PYTHON_FORMAT_EXEC ?= black
@@ -60,9 +78,10 @@ else
     YOSYS_PLUGIN_POSTFIX = .so
 endif
 
-# Reg test options
+# Quick test options
 TMP_QUICK_TEST = _tmp_quick_test
-REG_TEST_TYPE = basic
+
+# Reg test switches
 REG_TEST_SELECT = all
 REG_TEST_DRYRUN = OFF
 REG_TEST_FLAGS = 
@@ -71,6 +90,25 @@ REG_TEST_FLAGS += --dryrun
 endif
 # Suggest to increase when the machine is slow in disk read/write
 REG_TEST_NEW_THREAD_WAIT_TIME=1
+CHECK_QOR_FLAGS =
+ifeq ($(CHECK_QOR), ON)
+CHECK_QOR_FLAGS = --check_qor
+endif
+
+PARSE_REPORT_ONLY_FLAGS =
+ifeq ($(PARSE_REPORT_ONLY), ON)
+PARSE_REPORT_ONLY_FLAGS = --parse_report_only
+endif
+
+# Test configuration
+ifeq ($(OS),Windows_NT)
+  # Fallback to system Python on Windows (avoids Microsoft Store python3 stub)
+  REG_TEST_TASK := win_quick_test
+else
+  # Fallback to standard Python 3 on Linux and macOS
+  REG_TEST_TASK := quick_test
+endif
+
 
 # Extract the integer from -j<int> or --jobs=<int> in MAKEFLAGS
 NUM_JOBS := $(shell echo "$(MAKEFLAGS)" | grep -oE -- '-j[0-9]+|--jobs=[0-9]+' | grep -oE '[0-9]+' | tail -n1)
@@ -133,13 +171,6 @@ all: checkout_build
 # A shortcut command to run checkout and compile in serial
 	@+${MAKE} compile
 
-quick_test: checkout_regtest
-# Run a quick smoke test to test build results
-	echo "==== Quick test ===="
-	currDir=$${PWD} && mkdir -p ${TMP_QUICK_TEST} && cd ${TMP_QUICK_TEST} && \
-	$${currDir}/build/thirdparty/yosys/yosys -m $${currDir}/build/thirdparty/yosys/yosys-sofa${YOSYS_PLUGIN_POSTFIX} $${currDir}/test/tcl_tmpl/quick_synth.ys && \
-	cd $${currDir} || exit 1;
-
 format-cpp:
 # Format all the C/C++ files under this project, excluding submodules
 	for f in `find core -iname *.cpp -o -iname *.hpp -o -iname *.c -o -iname *.h`; \
@@ -183,6 +214,32 @@ check-format-yaml:
 
 format-all: format-cpp format-xml format-py format-yaml
 # Format all the C/C++, XML and Python codes
+
+quick_test: checkout_regtest
+# Run a quick smoke test to test build results
+	echo "==== Quick test ===="
+	currDir=$${PWD} && mkdir -p ${TMP_QUICK_TEST} && cd ${TMP_QUICK_TEST} && \
+	$${currDir}/build/thirdparty/yosys/yosys -m $${currDir}/build/thirdparty/yosys/yosys-sofa${YOSYS_PLUGIN_POSTFIX} $${currDir}/test/tcl_tmpl/quick_synth.ys && \
+	cd $${currDir} || exit 1;
+
+reg_test:
+# Run regression tests with pre-installed tools. Use CHECK_QOR=ON to enable qor check
+	echo "==== Regression test ===="
+	${PYTHON_EXEC} scripts/run_ezreg_test.py \
+	--path_config tests/common/path_config.yml \
+	--tut_config tests/common/syn_tool_config.yml \
+	--task tests/common/${REG_TEST_TASK}.yml ${CHECK_QOR_FLAG} \
+	--root_dir ${PWD} --j ${NUM_JOBS}
+
+reg_golden:
+# Create golden results for regression tests. Use PARSE_REPORT_ONLY=ON to skip tool run and focus on qor extraction
+	echo "==== Regression test ===="
+	${PYTHON_EXEC} scripts/run_ezreg_test.py \
+	--path_config tests/common/path_config.yml \
+	--tut_config tests/common/syn_tool_config.yml \
+	--task tests/common/${REG_TEST_TASK}.yml \
+	--create_golden ${PARSE_REPORT_ONLY_FLAGS} \
+	--root_dir ${PWD} --j ${NUM_JOBS}
 
 clean:
 # Remove current build results
