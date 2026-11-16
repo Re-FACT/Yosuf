@@ -90,13 +90,15 @@ REG_DRYRUN_FLAG += --dryrun
 endif
 # Suggest to increase when the machine is slow in disk read/write
 REG_TEST_NEW_THREAD_WAIT_TIME=1
+REG_CHECK_QOR=ON
 CHECK_QOR_FLAGS =
-ifeq ($(CHECK_QOR), ON)
+ifeq ($(REG_CHECK_QOR), ON)
 CHECK_QOR_FLAGS = --check_qor
 endif
 
+REG_PARSE_REPORT_ONLY=OFF
 PARSE_REPORT_ONLY_FLAGS =
-ifeq ($(PARSE_REPORT_ONLY), ON)
+ifeq ($(REG_PARSE_REPORT_ONLY), ON)
 PARSE_REPORT_ONLY_FLAGS = --parse_report_only
 endif
 
@@ -108,7 +110,6 @@ ifeq ($(OS),Windows_NT)
 else
   REG_TOOL_CONFIG := linux_tool_config.yml
 endif
-
 
 # Extract the integer from -j<int> or --jobs=<int> in MAKEFLAGS
 NUM_JOBS := $(shell echo "$(MAKEFLAGS)" | grep -oE -- '-j[0-9]+|--jobs=[0-9]+' | grep -oE '[0-9]+' | tail -n1)

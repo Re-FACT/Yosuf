@@ -137,6 +137,11 @@ jobs:
         run: |
           make quick_test
 
+      - name: Reg test
+        shell: msys2 {0}
+        run: |
+          make reg_test
+
   # Test the compilation compatibility
   ubuntu_build:
     name: ${{ matrix.config.name }}
@@ -196,6 +201,10 @@ jobs:
       - name: Quick test
         run: |
           make quick_test
+
+      - name: Reg test
+        run: |
+          make reg_test
 
   # Test the compilation compatibility
   macos_build:
@@ -268,3 +277,6 @@ jobs:
         run: |
           make quick_test
 
+      - name: Reg test
+        run: |
+          make reg_test
