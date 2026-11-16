@@ -84,9 +84,9 @@ TMP_QUICK_TEST = _tmp_quick_test
 # Reg test switches
 REG_TEST_SELECT = all
 REG_TEST_DRYRUN = OFF
-REG_TEST_FLAGS = 
+REG_DRYRUN_FLAG = 
 ifeq ($(REG_TEST_DRYRUN),ON)
-REG_TEST_FLAGS += --dryrun
+REG_DRYRUN_FLAG += --dryrun
 endif
 # Suggest to increase when the machine is slow in disk read/write
 REG_TEST_NEW_THREAD_WAIT_TIME=1
@@ -100,13 +100,13 @@ ifeq ($(PARSE_REPORT_ONLY), ON)
 PARSE_REPORT_ONLY_FLAGS = --parse_report_only
 endif
 
-# Test configuration
+REG_TEST_TASK=mosofa_test
+
+REG_TOOL_CONIG=tool_config.yml
 ifeq ($(OS),Windows_NT)
-  # Fallback to system Python on Windows (avoids Microsoft Store python3 stub)
-  REG_TEST_TASK := win_quick_test
+  REG_TOOL_CONFIG := win_tool_config.yml
 else
-  # Fallback to standard Python 3 on Linux and macOS
-  REG_TEST_TASK := quick_test
+  REG_TOOL_CONFIG := linux_tool_config.yml
 endif
 
 
@@ -215,38 +215,6 @@ check-format-yaml:
 format-all: format-cpp format-xml format-py format-yaml
 # Format all the C/C++, XML and Python codes
 
-quick_test: checkout_regtest
-# Run a quick smoke test to test build results
-	echo "==== Quick test ===="
-	currDir=$${PWD} && mkdir -p ${TMP_QUICK_TEST} && cd ${TMP_QUICK_TEST} && \
-	$${currDir}/build/thirdparty/yosys/yosys -m $${currDir}/build/thirdparty/yosys/yosys-sofa${YOSYS_PLUGIN_POSTFIX} $${currDir}/test/tcl_tmpl/quick_synth.ys && \
-	cd $${currDir} || exit 1;
-
-reg_test:
-# Run regression tests with pre-installed tools. Use CHECK_QOR=ON to enable qor check
-	echo "==== Regression test ===="
-	${PYTHON_EXEC} scripts/run_ezreg_test.py \
-	--path_config tests/common/path_config.yml \
-	--tut_config tests/common/syn_tool_config.yml \
-	--task tests/common/${REG_TEST_TASK}.yml ${CHECK_QOR_FLAG} \
-	--root_dir ${PWD} --j ${NUM_JOBS}
-
-reg_golden:
-# Create golden results for regression tests. Use PARSE_REPORT_ONLY=ON to skip tool run and focus on qor extraction
-	echo "==== Regression test ===="
-	${PYTHON_EXEC} scripts/run_ezreg_test.py \
-	--path_config tests/common/path_config.yml \
-	--tut_config tests/common/syn_tool_config.yml \
-	--task tests/common/${REG_TEST_TASK}.yml \
-	--create_golden ${PARSE_REPORT_ONLY_FLAGS} \
-	--root_dir ${PWD} --j ${NUM_JOBS}
-
-clean:
-# Remove current build results
-# One exception is the arkangel gui, where the working directory is the subumodule itself
-	rm -rf ${BUILD_DIR}
-	rm -rf projects
-
 update_version:
 # Update the patch count in the version number
 	echo "======== Bump up patch count in the version number ========"; \
@@ -260,6 +228,42 @@ release_version:
 generate_initial_tagged_commit:
 # Create the first version of tagged commit file, used for version update
 	git rev-list --max-parents=0 --abbrev-commit HEAD > ${TAGGED_COMMIT_FILE}
+
+quick_test: checkout_regtest
+# Run a quick smoke test to test build results
+	echo "==== Quick test ===="
+	currDir=$${PWD} && mkdir -p ${TMP_QUICK_TEST} && cd ${TMP_QUICK_TEST} && \
+	$${currDir}/build/thirdparty/yosys/yosys -m $${currDir}/build/thirdparty/yosys/yosys-sofa${YOSYS_PLUGIN_POSTFIX} $${currDir}/test/tmpl/quick_synth.ys && \
+	cd $${currDir} || exit 1;
+
+reg_test:
+# Run regression tests with pre-installed tools. Use CHECK_QOR=ON to enable qor check. Use REG_TEST_DRYRUN=OFF to enable dryrun mode. Use REG_TEST_SELECT=<string> to selectly run testcase. Use REG_TEST_TASK=[mosofa_test] to pick regression tasks
+	echo "==== Regression test ===="
+	${PYTHON_EXEC} test/ezreg/scripts/run_ezreg_test.py \
+	--path_config test/common/path_config.yml \
+	--tut_config test/common/${REG_TOOL_CONFIG} \
+	--task test/common/${REG_TEST_TASK}.yml ${CHECK_QOR_FLAG} \
+	--new_thread_wait_time ${REG_TEST_NEW_THREAD_WAIT_TIME} \
+	--task_select ${REG_TEST_SELECT} \
+	${REG_DRYRUN_FLAG} \
+	--root_dir ${PWD} --j ${NUM_JOBS}
+
+reg_golden:
+# Create golden results for regression tests. Use PARSE_REPORT_ONLY=ON to skip tool run and focus on qor extraction. Use REG_TEST_SELECT=<string> to selectly run testcase. Use REG_TEST_TASK=[mosofa_test] to pick regression tasks
+	echo "==== Regression test ===="
+	${PYTHON_EXEC} test/ezreg/scripts/run_ezreg_test.py \
+	--path_config test/common/path_config.yml \
+	--tut_config test/common/${REG_TOOL_CONFIG}.yml \
+	--task test/common/${REG_TEST_TASK}.yml \
+	--create_golden ${PARSE_REPORT_ONLY_FLAGS} \
+	--new_thread_wait_time ${REG_TEST_NEW_THREAD_WAIT_TIME} \
+	--task_select ${REG_TEST_SELECT} \
+	--root_dir ${PWD} --j ${NUM_JOBS}
+
+clean:
+# Remove current build results
+# One exception is the arkangel gui, where the working directory is the subumodule itself
+	rm -rf ${BUILD_DIR}
 
 # Functions to extract comments from Makefiles
 define COMMENT_EXTRACT
