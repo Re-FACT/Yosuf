@@ -253,7 +253,7 @@ reg_golden:
 	echo "==== Regression test ===="
 	${PYTHON_EXEC} test/ezreg/scripts/run_ezreg_test.py \
 	--path_config test/common/path_config.yml \
-	--tut_config test/common/${REG_TOOL_CONFIG}.yml \
+	--tut_config test/common/${REG_TOOL_CONFIG} \
 	--task test/common/${REG_TEST_TASK}.yml \
 	--create_golden ${PARSE_REPORT_ONLY_FLAGS} \
 	--new_thread_wait_time ${REG_TEST_NEW_THREAD_WAIT_TIME} \
