@@ -140,6 +140,7 @@ jobs:
       - name: Reg test
         shell: msys2 {0}
         run: |
+          source myenv/bin/activate
           make reg_test
 
   # Test the compilation compatibility
@@ -279,4 +280,5 @@ jobs:
 
       - name: Reg test
         run: |
+          source myenv/bin/activate
           make reg_test
