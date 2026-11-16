@@ -182,31 +182,9 @@ check-format-cpp:
 # Check if all the C/C++ files are in the expected format
 	${INFRA_ROOT}/scripts/check-format.sh -cpp
 
-format-xml:
-# Format all the XML files under this project, excluding submodules
-	for f in `find etc/device/*/arch etc/device/*/flow_conf etc/device/*/craft_files etc/device/*/openfpga_settings libs/lib*/example -iname *.xml`; \
-	do \
-	XMLLINT_INDENT="  " && ${XML_FORMAT_EXEC} --format $${f} --output $${f} || exit 1; \
-	done
-
-check-format-xml:
-# Check if all the XML files are in the expected format
-	${INFRA_ROOT}/scripts/check-format.sh -xml
-
-format-py:
-# Format all the python scripts under this project, excluding submodules
-	for f in `find test/scripts etc/utils/pin_table_gen etc/utils/bus_group_gen etc/utils/netlist_makeup -iname *.py`; \
-	do \
-	${PYTHON_FORMAT_EXEC} $${f} --line-length 100 || exit 1; \
-	done
-
-check-format-py:
-# Check if all the python files are in the expected format
-	${INFRA_ROOT}/scripts/check-format.sh -py
-
 format-yaml:
 # Format all the YAML under this project, excluding submodules
-	${PYTHON_EXEC} ${YAMLLINTER_EXEC} 'etc/device/*/arch' --fix --no-backup || exit 1; \
+	${PYTHON_EXEC} ${YAMLLINTER_EXEC} 'test/common' 'test/tasks' 'test/requirements' --fix --no-backup || exit 1; \
 
 check-format-yaml:
 # Check if all the YAML files are in the expected format
