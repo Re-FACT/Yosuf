@@ -70,6 +70,7 @@ TAGGED_COMMIT_FILE = .TAGGED_COMMIT
 VERSION_BUMP_TYPE = minor
 FORCE_COMMIT_VERSION_UPDATE = off
 INFRA_ROOT = ${PWD}/utils/refact_infra/
+YAMLLINTER_EXEC ?= ${INFRA_ROOT}/scripts/yaml_linter.py
 
 # Detect operating system and use proper name
 ifeq ($(OS),Windows_NT)
@@ -185,7 +186,9 @@ check-format-cpp:
 
 format-yaml:
 # Format all the YAML under this project, excluding submodules
-	${PYTHON_EXEC} ${YAMLLINTER_EXEC} 'test/common' 'test/tasks' 'test/requirements' --fix --no-backup || exit 1; \
+	${PYTHON_EXEC} ${YAMLLINTER_EXEC} 'test/common' --fix --no-backup || exit 1; \
+	${PYTHON_EXEC} ${YAMLLINTER_EXEC} 'test/tasks' --fix --no-backup || exit 1; \
+	${PYTHON_EXEC} ${YAMLLINTER_EXEC} 'test/requirements' --fix --no-backup || exit 1;
 
 check-format-yaml:
 # Check if all the YAML files are in the expected format
