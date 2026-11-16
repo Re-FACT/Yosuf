@@ -1,11 +1,3 @@
-# Each tool has a unique name, path to binary (not required if already in the system path) and option list
-# kargs are the keyword arguments which can be swapped in command line options 
-# pargs are the positional arguments which must appear in a fixed location of command line options 
-# options are the command-line options required to run a specific type of task. The keywords in brackets [] are replaced by the corresponding content from task configuraiton file 
-# Take the example below, the 'gds_dummy' task will invoke a tool run through the following command line:
-#   yosys run.tcl -l run.log
-# Where in the task configuration file,
-#   - the '[runtime_script]' is defined through the syntax 'runtime_script' 
 yosys-mosofa:
   bin: "[YOSYS_BIN_PATH]"
   runtime_script: run.ys

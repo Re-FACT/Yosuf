@@ -1,14 +1,14 @@
 # Subtasks
 # Each entity has a unique name
 and2:
-  enable: true 
+  enable: true
   tool_under_test: yosys-mosofa
   template:
     path: "[TEMPLATE_ROOT]/ys_mosofa_run_tmpl.ys"
-    multiple_line_replaced_variables: 
+    multiple_line_replaced_variables:
       design_inputs:
         - "[BENCHMARK_ROOT]/ubm/simple_gates/and2/and2.v"
-    single_line_replaced_variables: 
+    single_line_replaced_variables:
       design_output: "and2_post_synth.v"
       top_module: "[current_design]"
       resource_report: "resource.json"
@@ -16,8 +16,7 @@ and2:
   pass_checks:
     - "[REQ_ROOT]/log_error_keywords.yaml"
   qor_checks:
-    - file: resource.json 
+    - file: resource.json
       type: json
       metric: "[REQ_ROOT]/ys_rsrc_keywords.yaml"
   expect_failure: false
-

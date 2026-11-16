@@ -1,8 +1,8 @@
 # Common root paths. Each entity name can be replaced in task configuration file
 # Root path is specified when running the ezreg python
-# For example: 
+# For example:
 #   python3 run_ezreg_test.py --root_dir /home/xtang
-# The value of the benchmark_root will be 
+# The value of the benchmark_root will be
 #   /home/xtang/etc/benchmarks
 # When user can use the variable in task configuration like
 #   var_name: "[BENCHMARK_ROOT]/and2/and2.v"
