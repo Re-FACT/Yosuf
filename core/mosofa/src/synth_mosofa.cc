@@ -5,7 +5,10 @@
 
 using namespace std;
 /* Constants for device name */
-constexpr const char *MOSOFA_DNAME = "mosofa-hd";
+constexpr const char *MOSOFA_H_DNAME = "mosofa-h";
+constexpr const char *MOSOFA_D_DNAME = "mosofa-d";
+constexpr const char *MOSOFA_M_DNAME = "mosofa-m";
+constexpr const char *MOSOFA_DM_DNAME = "mosofa-dm";
 
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
@@ -36,7 +39,7 @@ struct SynthMosofaPass : public ScriptPass {
     log("        run synthesis for the specified Mosofa architecture\n");
     log("        generate the synthesis netlist for the specified family.\n");
     log("        supported values:\n");
-    log("          %s\n", MOSOFA_DNAME);
+    log("          %s\n", MOSOFA_H_DNAME);
     log("\n");
     log("    -blif <file>\n");
     log("        write the design to the specified BLIF file. Writing of an "
@@ -75,7 +78,7 @@ struct SynthMosofaPass : public ScriptPass {
     top_opt = "-auto-top";
     blif_file = "";
     verilog_file = "";
-    family = MOSOFA_DNAME;
+    family = MOSOFA_H_DNAME;
     inferAdder = true;
     inferDsp = true;
     no_opt = false;
@@ -151,11 +154,11 @@ struct SynthMosofaPass : public ScriptPass {
       log_cmd_error("This command only operates on fully selected designs!\n");
     }
     /* Pre-check on family name and confirm on selection*/
-    if (family != MOSOFA_DNAME) {
+    if (family != MOSOFA_H_DNAME) {
       log_cmd_error("Invalid family specified: '%s'\n", family.c_str());
     }
     log("Selected device family: %s\n", family.c_str());
-    if (family == MOSOFA_HD_DNAME) {
+    if (family == MOSOFA_H_DNAME) {
       inferAdder = true;
       inferDsp = false;
     }
