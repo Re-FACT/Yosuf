@@ -1,0 +1,9 @@
+yosys-mosofa:
+  bin: "[YOSYS_BIN_PATH]"
+  runtime_script: run.ys
+  runtime_log: run.log
+  options: "kargs"
+  kargs:
+    - name: "-m [MOSOFA_PLUGIN_PATH].dll"
+    - name: "-s [runtime_script]"
+    - name: "-l [runtime_log]"

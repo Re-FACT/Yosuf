@@ -1,0 +1,11 @@
+keywords:
+  - name: "Regular error"
+    ignore_case: true
+    regex: "^Error"
+  - name: "Failures"
+    ignore_case: true
+    regex: "^Fail [^0]"
+  - name: "SegFault"
+    regex: "^Segmentation fault"
+  - name: "Assertation"
+    regex: "^Asseration.*failed"

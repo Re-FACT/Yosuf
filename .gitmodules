@@ -4,3 +4,6 @@
 [submodule "etc/ubm"]
 	path = etc/benchmarks/ubm
 	url = https://github.com/tangxifan/ubm.git
+[submodule "test/ezreg"]
+	path = test/ezreg
+	url = https://github.com/Re-FACT/ezreg.git

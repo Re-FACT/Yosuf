@@ -27,7 +27,7 @@ To run in script mode, you may run the following command
   ./build/thirdparty/yosys/yosys <your_script>.ys
 
 
-.. _launch_yosuf_shell_plugin:
+.. _launch_yosuf_shell_plugin_sofa:
 
 Load SOFA Plug-in
 ------------------
@@ -60,6 +60,53 @@ You may see a help desk shown as following. Note that different version may carr
         - qlsofa-hd
         - sofa-chd
         - sofa-plus-hd
+
+    -blif <file>
+        write the design to the specified BLIF file. Writing of an output file
+        is omitted if this parameter is not specified.
+
+    -verilog <file>
+        write the design to the specified verilog file. Writing of an output
+        file is omitted if this parameter is not specified.
+
+    -no_dsp
+        By default use DSP blocks in output netlist.
+        do not use DSP blocks to implement multipliers and associated logic
+
+    -no_adder
+        By default use adder cells in output netlist.
+        Specifying this switch turns it off.
+
+.. _launch_yosuf_shell_plugin_mosofa:
+
+Load MOSOFA Plug-in
+-------------------
+
+Yosuf synthesis recipes can be enabled by loading dedicated plug-in into Yosys.
+
+After launching Yosys, run the following command to load plug-in
+
+.. code-block::
+
+  plugin -i yosys-mosofa
+  # Alternatively, see how to use the synth command enabled by plug-in
+  synth_mosofa -help
+
+You may see a help desk shown as following. Note that different version may carry slight difference! Refer to you help desk as final.
+
+.. code-block::
+
+   synth_mosofa [options]
+   This command runs synthesis for MOSOFA eFPGAs
+
+    -top <module>
+         use the specified module as top module
+
+    -family <family>
+        run synthesis for the specified SOFA architecture
+        generate the synthesis netlist for the specified family.
+        supported values:
+        - mosofa
 
     -blif <file>
         write the design to the specified BLIF file. Writing of an output file

@@ -27,10 +27,6 @@ jobs:
         config:
           - name: "C/C++"
             code_type: "-cpp"
-          - name: "XML"
-            code_type: "-xml"
-          - name: "Python"
-            code_type: "-py"
           - name: "Yaml"
             code_type: "-yaml"
     steps:

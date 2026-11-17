@@ -43,7 +43,7 @@ The following shows an example of synthesis script.
   # Read design sources. You may call the read_verilog if there are multiple design source files
   read_verilog ../benchmark/and2/and2.v
   # Run synthesis
-  synth_rf_alkaid -family sofa-hd -blif yosys_out.blif -top and2
+  synth_sofa -family sofa-hd -blif yosys_out.blif -top and2
 
 .. note:: If you want to try a different benchmark, the top module may be different!
 

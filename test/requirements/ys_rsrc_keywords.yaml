@@ -1,0 +1,5 @@
+metric:
+ - name: num_of_lut
+   keyword: "design/num_cells_by_type/$lut"
+   upper_bound: 0.3
+   lower_bound: 0.3
